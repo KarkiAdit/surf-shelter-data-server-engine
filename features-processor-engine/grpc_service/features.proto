@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+service FeaturesProcessor {
+    rpc GenFeaturesUnusualExt (FeatureRequest) returns (FeatureResponse) {}
+    rpc GenFeaturesTyposquatting (FeatureRequest) returns (FeatureResponse) {}
+    rpc GenFeaturesPhishing (FeatureRequest) returns (FeatureResponse) {}
+    rpc GenLabel (FeatureRequest) returns (LabelResponse) {}
+}
+
+message FeatureRequest {
+    string url = 1;
+}
+
+message FeatureResponse {
+    map<string, float> features = 1;
+}
+
+message LabelResponse {
+    map<string, float> prediction = 1;
+}
