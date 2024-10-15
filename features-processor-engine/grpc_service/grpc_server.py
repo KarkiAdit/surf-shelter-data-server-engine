@@ -1,5 +1,5 @@
 """
-gRPC server for handling client requests (from Flask App or other third-party applications) within Surf Shelter
+gRPC server for handling client requests (from Flask App or other third-party applications) within Surf Shelter for the Features Processor Engine
 """
 
 import grpc

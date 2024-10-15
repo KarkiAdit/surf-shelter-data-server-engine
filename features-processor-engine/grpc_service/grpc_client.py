@@ -1,5 +1,5 @@
 """
-gRPC client to handle Flask requests from Surf Shelter users.
+gRPC client to handle Flask requests from Surf Shelter users for the Features Processor Engine.
 """
 
 from google.protobuf.json_format import MessageToDict
