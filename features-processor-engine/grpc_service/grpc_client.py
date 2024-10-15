@@ -6,11 +6,6 @@ from google.protobuf.json_format import MessageToDict
 import grpc
 from . import features_pb2
 from . import features_pb2_grpc
-import logging
-
-# Configure the logger
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 # Function to create the gRPC stub
