@@ -16,5 +16,5 @@ message FeatureResponse {
 }
 
 message LabelResponse {
-    map<string, float> prediction = 1;
+    map<string, bool> prediction = 1;
 }
