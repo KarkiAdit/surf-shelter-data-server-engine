@@ -27,8 +27,14 @@ class PredictionProcessor(features_pb2_grpc.PredictionEngineServicer):
 
         # Use recent model from Recent Models table to make a prediction
         # Update New Sampled Rows table
-        predictionLabel = False  # default value
-        return features_pb2.PredictionResponse(predictedLabel=predictionLabel)
+        prediction = {
+            "predictedLabel": False,
+            "accuracy": 0.95,
+            "pValueAccuracy": 0.05,
+            "loss": 0.15,
+        }
+        # default value
+        return features_pb2.PredictionResponse(**prediction)
 
 
 def serve():

@@ -19,7 +19,7 @@ _sym_db = _symbol_database.Default()
 
 
 DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
-    b'\n\x0e\x66\x65\x61tures.proto"t\n\x0f\x46\x65\x61tureResponse\x12\x30\n\x08\x66\x65\x61tures\x18\x01 \x03(\x0b\x32\x1e.FeatureResponse.FeaturesEntry\x1a/\n\rFeaturesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x02:\x02\x38\x01"\x92\x01\n\x11PredictionRequest\x12(\n\x0eunusualExtInfo\x18\x01 \x01(\x0b\x32\x10.FeatureResponse\x12+\n\x11typosquattingInfo\x18\x02 \x01(\x0b\x32\x10.FeatureResponse\x12&\n\x0cphishingInfo\x18\x03 \x01(\x0b\x32\x10.FeatureResponse"v\n\rLabelResponse\x12\x32\n\nprediction\x18\x01 \x03(\x0b\x32\x1e.LabelResponse.PredictionEntry\x1a\x31\n\x0fPredictionEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x08:\x02\x38\x01",\n\x12PredictionResponse\x12\x16\n\x0epredictedLabel\x18\x01 \x01(\x08\x32O\n\x10PredictionEngine\x12;\n\x0eMakePrediction\x12\x12.PredictionRequest\x1a\x13.PredictionResponse"\x00\x62\x06proto3'
+    b'\n\x0e\x66\x65\x61tures.proto"t\n\x0f\x46\x65\x61tureResponse\x12\x30\n\x08\x66\x65\x61tures\x18\x01 \x03(\x0b\x32\x1e.FeatureResponse.FeaturesEntry\x1a/\n\rFeaturesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x02:\x02\x38\x01"\x92\x01\n\x11PredictionRequest\x12(\n\x0eunusualExtInfo\x18\x01 \x01(\x0b\x32\x10.FeatureResponse\x12+\n\x11typosquattingInfo\x18\x02 \x01(\x0b\x32\x10.FeatureResponse\x12&\n\x0cphishingInfo\x18\x03 \x01(\x0b\x32\x10.FeatureResponse"v\n\rLabelResponse\x12\x32\n\nprediction\x18\x01 \x03(\x0b\x32\x1e.LabelResponse.PredictionEntry\x1a\x31\n\x0fPredictionEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x08:\x02\x38\x01"d\n\x12PredictionResponse\x12\x16\n\x0epredictedLabel\x18\x01 \x01(\x08\x12\x10\n\x08\x61\x63\x63uracy\x18\x02 \x01(\x02\x12\x16\n\x0epValueAccuracy\x18\x03 \x01(\x02\x12\x0c\n\x04loss\x18\x04 \x01(\x02\x32O\n\x10PredictionEngine\x12;\n\x0eMakePrediction\x12\x12.PredictionRequest\x1a\x13.PredictionResponse"\x00\x62\x06proto3'
 )
 
 _globals = globals()
@@ -42,7 +42,7 @@ if not _descriptor._USE_C_DESCRIPTORS:
     _globals["_LABELRESPONSE_PREDICTIONENTRY"]._serialized_start = 354
     _globals["_LABELRESPONSE_PREDICTIONENTRY"]._serialized_end = 403
     _globals["_PREDICTIONRESPONSE"]._serialized_start = 405
-    _globals["_PREDICTIONRESPONSE"]._serialized_end = 449
-    _globals["_PREDICTIONENGINE"]._serialized_start = 451
-    _globals["_PREDICTIONENGINE"]._serialized_end = 530
+    _globals["_PREDICTIONRESPONSE"]._serialized_end = 505
+    _globals["_PREDICTIONENGINE"]._serialized_start = 507
+    _globals["_PREDICTIONENGINE"]._serialized_end = 586
 # @@protoc_insertion_point(module_scope)

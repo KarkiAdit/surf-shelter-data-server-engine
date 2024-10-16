@@ -20,4 +20,7 @@ message LabelResponse {
 
 message PredictionResponse {
     bool predictedLabel = 1;
+    float accuracy = 2;
+    float pValueAccuracy = 3;
+    float loss = 4;
 }
