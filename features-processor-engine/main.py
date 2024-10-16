@@ -1,3 +1,13 @@
+"""
+This microservice acts as the gateway for the Features Processor Engine and performs the following key tasks:
+
+Input: Accepts a URL as input.
+Feature Extraction: Processes the given URL to generate numerical values for all relevant features that are used to build the machine learning model.
+Label Association: Associates the generated features with the correct label based on reputation score collected from public API.
+
+Output: Returns the numerical feature set along with the associated label.
+"""
+
 import threading
 from app import create_app
 from grpc_service.grpc_server import serve as setup_grpc_server
