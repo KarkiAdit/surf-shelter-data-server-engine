@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+service PredictionEngine {
+    rpc MakePrediction (PredictionRequest) returns (PredictionResponse) {}
+}
+
+message FeatureResponse {
+    map<string, float> features = 1;
+}
+
+message PredictionRequest {
+    FeatureResponse unusualExtInfo = 1;
+    FeatureResponse typosquattingInfo = 2;
+    FeatureResponse phishingInfo = 3;
+}
+
+message LabelResponse {
+    map<string, bool> prediction = 1;
+}
+
+message PredictionResponse {
+    bool predictedLabel = 1;
+}
