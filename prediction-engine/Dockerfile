@@ -16,6 +16,6 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 # Set PYTHONPATH to include the root of your project
 ENV PYTHONPATH=/prediction-engine
 COPY . .
-# Expose the gRPC port
-EXPOSE 50051
+# Expose both Flask and gRPC port
+EXPOSE 5001 50051
 CMD ["python", "main.py"]
