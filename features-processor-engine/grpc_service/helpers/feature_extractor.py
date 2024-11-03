@@ -1,3 +1,4 @@
+from . import url_comparator
 class FeatureExtractor:
     """Extracts features from a URL by calling external APIs or research and analysis."""
 
@@ -21,7 +22,6 @@ class FeatureExtractor:
             print(f"Error calculating the TLD analysis score: {e}")
             self.__tld_analysis_score = None
   
-
     def __analyze_ip_address(self):
         """Compute a score based on IP address analysis of the URL."""
         try:
@@ -40,7 +40,10 @@ class FeatureExtractor:
             print(f"Error calculating the sub-domain analysis score: {e}")
             self.__sub_domain_analysis_score = None      
 
-    
+    def __compute_levenshtein_dx(self):
+        url_cpr = url_comparator.URLComparator(self.__website_url)
+        self.__levenshtein_dx = url_cpr.levenshtein_dx 
+
     def get_unusual_ext_features(self):
         self.__compute_url_length()
         self.__analyze_top_level_domain()
@@ -53,3 +56,7 @@ class FeatureExtractor:
             "sub-domain-analysis-score": self.__sub_domain_analysis_score,
         }
     
+    def get_typosquatting_features(self):
+        return {
+            "levenshtein_dx": self.__levenshtein_dx,
+        }
