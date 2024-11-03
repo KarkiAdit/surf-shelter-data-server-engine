@@ -57,6 +57,7 @@ class FeatureExtractor:
         }
     
     def get_typosquatting_features(self):
+        self.__compute_levenshtein_dx()
         return {
             "levenshtein_dx": self.__levenshtein_dx,
         }
