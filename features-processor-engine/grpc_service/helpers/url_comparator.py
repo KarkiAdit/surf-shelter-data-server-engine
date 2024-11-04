@@ -1,6 +1,5 @@
-from urllib.parse import urlparse
 import numpy as np
-
+from urllib.parse import urlparse
 
 class URLComparator:
     __good_urls = [
@@ -206,8 +205,8 @@ class URLComparator:
     ]
     levenshtein_dx = None
 
-    def __init__(self, target_url):
-        self.__target_url = target_url
+    def __init__(self, target_domain):
+        self.__target_domain = target_domain
 
     def __find_levenshtein_distance(self, str1, str2):
         """Helper method to compute Levenshtein distance between two strings."""
@@ -230,13 +229,12 @@ class URLComparator:
 
     def run_url_comparator(self):
         try:
-            # Extract only the Network Location Part or Domain name of the website
-            parsed_target = urlparse(self.__target_url).netloc
-
             distances = []
             for url in self.__good_urls:
-                parsed_good_url = urlparse(url).netloc
-                distance = self.__find_levenshtein_distance(parsed_target, parsed_good_url)
+                parsed_good_domain = urlparse(url).netloc
+                distance = self.__find_levenshtein_distance(
+                    self.__target_domain, parsed_good_domain
+                )
                 distances.append(distance)
 
             # Set minimum distance as the typosquatting score
