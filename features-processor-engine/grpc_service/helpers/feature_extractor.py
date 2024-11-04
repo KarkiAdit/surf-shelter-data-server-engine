@@ -5,7 +5,12 @@ from . import url_comparator
 
 
 class FeatureExtractor:
-    """Extracts features from a URL by calling external APIs or research and analysis."""
+    """Extracts various features from a URL through external API calls, research, and analysis.
+
+    This class provides methods to gather important metrics and attributes of a URL, such as reputation scores, 
+    domain age, DNS Time-To-Live (TTL), and similarity to known trusted domains. These features are used for 
+    further analysis to assess the URL’s trustworthiness, potential risks, and overall reliability.
+    """
 
     def __init__(self, website_url=None):
         self.__website_url = website_url
@@ -61,10 +66,22 @@ class FeatureExtractor:
             self.__sub_domain_analysis_score = None
 
     def __compute_levenshtein_dx(self):
+        """Compute the Levenshtein distance between the website's domain and a set of trusted domains.
+
+        This method calculates the Levenshtein distance, which measures the similarity between the website's domain 
+        and known trusted domains. A lower distance indicates higher similarity, suggesting a possible typosquatting 
+        or phishing attempt if the domain is closely similar to a trusted domain.
+        """
         url_cpr = url_comparator.URLComparator(self.__website_domain)
         self.__levenshtein_dx = url_cpr.levenshtein_dx
 
     def __compute_time_to_live(self):
+        """Retrieve the website's DNS Time-To-Live (TTL) value using Google's DNS API.
+
+        This method queries Google's DNS API to obtain the TTL value for the website's domain, which represents 
+        the duration (in seconds) that DNS records are cached before requiring a refresh. A lower TTL indicates 
+        that the domain's DNS information is updated frequently, while a higher TTL suggests longer caching periods.
+        """
         try:
             response = requests.get(f"https://dns.google/resolve?name={self.__website_domain}&type=A")
             response.raise_for_status()
@@ -79,6 +96,13 @@ class FeatureExtractor:
             self.__time_to_live = None
 
     def __compute_domain_age(self):
+        """Retrieve and compute the age of the website's domain using the WHOIS XML API.
+
+        This method calls the WHOIS XML API to obtain the estimated domain age in years. Domain age is an indicator of 
+        the website's longevity and potential trustworthiness, as older domains are generally considered more reliable. 
+        If the domain age is available, it is stored; otherwise, a default value of 0 is set if the information 
+        cannot be retrieved.
+        """
         params = {
             "apiKey": "***",
             "domainName": self.__website_domain,
@@ -101,6 +125,12 @@ class FeatureExtractor:
 
 
     def __compute_reputation_score(self):
+        """Compute a reputation score indicating the likelihood of a website being a phishing site using VirusTotal's API.
+
+        This method submits the website URL to VirusTotal for analysis, retrieves the analysis report, and calculates 
+        a reputation score based on the proportion of malicious and suspicious flags from various security engines.
+        The score ranges from 0 to 1, where a higher score indicates a higher likelihood of the website being malicious or suspicious.
+        """
         headers = {
             "accept": "application/json",
             "x-apikey": "*****",
