@@ -142,23 +142,19 @@ class FeatureExtractor:
         try:
             # Scan the URL to create a VirusTotal report
             make_report_response = requests.post("https://www.virustotal.com/api/v3/urls", data=payload, headers=headers)
-            make_report_response.raise_for_status()
-            
+            make_report_response.raise_for_status()     
             # Extract the report ID
             report_id = make_report_response.json().get("data", {}).get("id")
             if not report_id:
                 print("Failed to retrieve report ID.")
                 self.__reputation_score = None
                 return
-            
             # Wait for the analysis to complete
             time.sleep(5)
-
             # Read the report
             read_report_response = requests.get(f"https://www.virustotal.com/api/v3/analyses/{report_id}", headers=headers)
             read_report_response.raise_for_status()
             data = read_report_response.json()
-
             # Calculate reputation score based on stats
             stats = data.get("data", {}).get("attributes", {}).get("stats", {})
             if stats:
@@ -171,10 +167,63 @@ class FeatureExtractor:
             else:
                 print("No stats data available in the response.")
                 self.__reputation_score = None
-
         except requests.exceptions.RequestException as e:
             print(f"Error fetching reputation score from VirusTotal API: {e}")
             self.__reputation_score = None
+
+    def __evaluate_malicious_label(self):
+        """
+        Checks the likelihood of a URL being malicious using the Google Safe Browsing API.
+
+        This method submits the URL for analysis against "MALWARE" and "SOCIAL_ENGINEERING" threats, evaluates the threat counts, 
+        and flags the URL as malicious if both threat types exceed set thresholds. If an error occurs, the result is set to None.
+        """
+        params = {
+            "key": "*******"
+        }
+        payload = {
+            "client": {
+                "clientId": "surf-shelter-data-server-engine",
+                "clientVersion": "0.0"
+            },
+            "threatInfo": {
+                "threatTypes": ["MALWARE", "SOCIAL_ENGINEERING"],
+                "platformTypes": ["ANY_PLATFORM"],
+                "threatEntryTypes": ["URL"],
+                "threatEntries": [{"url": self.__website_url}]
+            }
+        }   
+        # Define threshold values based on security research
+        malware_threshold = 3
+        social_engineering_threshold = 3
+        try:
+            response = requests.post(
+                "https://safebrowsing.googleapis.com/v4/threatMatches:find",
+                params=params,
+                json=payload
+            )
+            response.raise_for_status()
+            data = response.json() 
+            if "matches" in data:
+                threat_counts = {"MALWARE": 0, "SOCIAL_ENGINEERING": 0}   
+                # Aggregate threat counts
+                for match in data["matches"]:
+                    threat_type = match['threatType']
+                    threat_counts[threat_type] += 1
+                # Label as malicious only if both threats exceed their thresholds
+                if (threat_counts["MALWARE"] >= malware_threshold and 
+                    threat_counts["SOCIAL_ENGINEERING"] >= social_engineering_threshold):
+                    self.__is_malicious = True
+                    print(f"The URL is flagged as malicious. Threat counts: {threat_counts}")
+                else:
+                    self.__is_malicious = False
+                    print("The URL does not meet the malicious threshold.")     
+            else:
+                self.__is_malicious = False
+                print("The URL is safe.")
+        except requests.exceptions.RequestException as e:
+            print(f"Error checking URL with Google Safe Browsing API: {e}")
+            self.__is_malicious = None
 
     def get_unusual_ext_features(self):
         self.__compute_url_length()
@@ -202,4 +251,12 @@ class FeatureExtractor:
             "time_to_live": self.__time_to_live,
             "domain_age": self.__domain_age,
             "reputation_score": self.__reputation_score,
+        }
+    
+    def get_prediction_label(self):
+        self.__evaluate_malicious_label()
+        return {
+            "is_malicious": self.__is_malicious,
+            "is_click_fraud": False,
+            "is_pay_fraud": False,
         }
