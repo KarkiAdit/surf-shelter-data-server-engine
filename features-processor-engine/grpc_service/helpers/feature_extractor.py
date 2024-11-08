@@ -2,8 +2,16 @@ import os
 import requests
 import time
 import re
+import logging
 from . import url_comparator
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[
+        logging.StreamHandler()# Output logs to the console
+    ]
+)
 class FeatureExtractor:
     """Extracts various features from a URL through external API calls, research, and analysis.
 
@@ -118,6 +126,7 @@ class FeatureExtractor:
             data = response.json()
             # Extract the estimated domain age if available
             estimated_age = data.get('WhoisRecord', {}).get('estimatedDomainAge')
+            logging.info("WHOIS Record's estimated domain age: ", estimated_age)
             if estimated_age is not None:
                 self.__domain_age = float(estimated_age)
             else:
@@ -125,6 +134,7 @@ class FeatureExtractor:
                 self.__domain_age = 0.0
         except requests.exceptions.RequestException as e:
             print(f"Error fetching domain age from WHOIS API service {e}")
+            logging.info(f"Error fetching domain age from WHOIS API service {e}")
             self.__domain_age = None
 
 
@@ -149,6 +159,7 @@ class FeatureExtractor:
             make_report_response.raise_for_status()     
             # Extract the report ID
             report_id = make_report_response.json().get("data", {}).get("id")
+            logging.info("Report id", report_id)
             if not report_id:
                 print("Failed to retrieve report ID.")
                 self.__reputation_score = None
@@ -157,6 +168,7 @@ class FeatureExtractor:
             time.sleep(5)
             # Read the report
             read_report_response = requests.get(f"https://www.virustotal.com/api/v3/analyses/{report_id}", headers=headers)
+            logging.info("report", read_report_response)
             read_report_response.raise_for_status()
             data = read_report_response.json()
             # Calculate reputation score based on stats
@@ -174,6 +186,7 @@ class FeatureExtractor:
                 self.__reputation_score = 0.0
         except requests.exceptions.RequestException as e:
             print(f"Error fetching reputation score from VirusTotal API: {e}")
+            logging.info(f"Error fetching reputation score from VirusTotal API: {e}")
             self.__reputation_score = None
 
     def __evaluate_malicious_label(self):
