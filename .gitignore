@@ -4,3 +4,6 @@ env/
 
 # gRPC generated
 *.pb2.py
+
+# Ignore .env files
+.env

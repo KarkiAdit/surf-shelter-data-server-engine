@@ -1,3 +1,4 @@
+import os
 import requests
 import time
 from urllib.parse import urlparse
@@ -104,7 +105,7 @@ class FeatureExtractor:
         cannot be retrieved.
         """
         params = {
-            "apiKey": "***",
+            "apiKey": os.getenv("WHOIS_XML_KEY"),
             "domainName": self.__website_domain,
             "outputFormat": "JSON"
         }
@@ -133,7 +134,7 @@ class FeatureExtractor:
         """
         headers = {
             "accept": "application/json",
-            "x-apikey": "*****",
+            "x-apikey": os.getenv("VIRUS_TOTAL_KEY"),
             "content-type": "application/x-www-form-urlencoded"
         }
         payload = {
@@ -179,7 +180,7 @@ class FeatureExtractor:
         and flags the URL as malicious if both threat types exceed set thresholds. If an error occurs, the result is set to None.
         """
         params = {
-            "key": "*******"
+            "key": os.getenv("GOOGLE_SAFE_BROWSING_KEY")
         }
         payload = {
             "client": {
