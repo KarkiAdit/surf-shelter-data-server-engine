@@ -1,9 +1,8 @@
 import os
 import requests
 import time
-from urllib.parse import urlparse
+import re
 from . import url_comparator
-
 
 class FeatureExtractor:
     """Extracts various features from a URL through external API calls, research, and analysis.
@@ -20,9 +19,11 @@ class FeatureExtractor:
     def __extract_domain(self):
         """Compute the domain name from the URL."""
         try:
-            self.__website_domain = urlparse(self.__website_url).netloc
+            # Regex to match the domain part
+            match = re.search(r"^(?:http[s]?://)?([^:/\s]+)", self.__website_url)
+            self.__website_domain = match.group(1) if match else None
         except Exception as e:
-            print(f"Error calculating the website domain: {e}")
+            print(f"Error analyzing the website domain: {e}")
             self.__website_domain = None
 
     def __compute_url_length(self):
@@ -74,6 +75,8 @@ class FeatureExtractor:
         or phishing attempt if the domain is closely similar to a trusted domain.
         """
         url_cpr = url_comparator.URLComparator(self.__website_domain)
+        # Run the pattern matching algorithm to find the levenshtein dx
+        url_cpr.run_url_comparator()
         self.__levenshtein_dx = url_cpr.levenshtein_dx
 
     def __compute_time_to_live(self):
@@ -88,10 +91,10 @@ class FeatureExtractor:
             response.raise_for_status()
             data = response.json()
             if "Answer" in data:
-                self.__time_to_live = data['Answer'][0]['TTL']
+                self.__time_to_live = float(data['Answer'][0]['TTL'])
             else:
                 print("No DNS records found for the specified domain.")
-                self.__time_to_live = 0
+                self.__time_to_live = 0.0
         except requests.exceptions.RequestException as e:
             print(f"Error fetching TTL from Google DNS API: {e}")
             self.__time_to_live = None
@@ -116,13 +119,13 @@ class FeatureExtractor:
             # Extract the estimated domain age if available
             estimated_age = data.get('WhoisRecord', {}).get('estimatedDomainAge')
             if estimated_age is not None:
-                self.__domain_age = estimated_age
+                self.__domain_age = float(estimated_age)
             else:
                 print(f"Could not retrieve the estimated domain age.")
-                self.__domain_age = 0
+                self.__domain_age = 0.0
         except requests.exceptions.RequestException as e:
-            print(f"Error fetching domain age from WHOIS API service {e}")    
-            self.__domain_age = None   
+            print(f"Error fetching domain age from WHOIS API service {e}")
+            self.__domain_age = None
 
 
     def __compute_reputation_score(self):
@@ -161,13 +164,14 @@ class FeatureExtractor:
             if stats:
                 total_reports = stats.get("malicious", 0) + stats.get("suspicious", 0) + stats.get("harmless", 0) + stats.get("undetected", 0)
                 if total_reports > 0:
+                    print("Evaluated using existing data...")
                     self.__reputation_score = (stats.get("malicious", 0) + stats.get("suspicious", 0)) / total_reports
                 else:
                     print("No available data to calculate a reputation score.")
-                    self.__reputation_score = 0
+                    self.__reputation_score = 0.0
             else:
                 print("No stats data available in the response.")
-                self.__reputation_score = None
+                self.__reputation_score = 0.0
         except requests.exceptions.RequestException as e:
             print(f"Error fetching reputation score from VirusTotal API: {e}")
             self.__reputation_score = None
@@ -183,17 +187,21 @@ class FeatureExtractor:
             "key": os.getenv("GOOGLE_SAFE_BROWSING_KEY")
         }
         payload = {
-            "client": {
-                "clientId": "surf-shelter-data-server-engine",
-                "clientVersion": "0.0"
-            },
-            "threatInfo": {
-                "threatTypes": ["MALWARE", "SOCIAL_ENGINEERING"],
-                "platformTypes": ["ANY_PLATFORM"],
-                "threatEntryTypes": ["URL"],
-                "threatEntries": [{"url": self.__website_url}]
-            }
-        }   
+                    "client": {
+                        "clientId": "surf-shelter-data-server-engine",
+                        "clientVersion": "0.0"
+                    },
+                    "threatInfo": {
+                        "threatTypes": ["MALWARE", "SOCIAL_ENGINEERING"],
+                        "platformTypes": ["ANY_PLATFORM"],
+                        "threatEntryTypes": ["URL"],
+                        "threatEntries": [
+                            {
+                                "url": self.__website_url
+                            }
+                        ]
+                    }
+                }
         # Define threshold values based on security research
         malware_threshold = 3
         social_engineering_threshold = 3

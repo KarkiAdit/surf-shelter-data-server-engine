@@ -25,7 +25,7 @@ def gen_features_unusual_ext():
 def gen_features_typosquatting():
     try:
         url = extract_and_validate_url()
-        return jsonify(get_features_phishing(url))
+        return jsonify(get_features_typosquatting(url))
     except Exception as e:
         abort(500, description=f"Server error: {str(e)}")
 
@@ -35,7 +35,7 @@ def gen_features_typosquatting():
 def gen_features_phishing():
     try:
         url = extract_and_validate_url()
-        return jsonify(get_features_typosquatting(url))
+        return jsonify(get_features_phishing(url))
     except Exception as e:
         abort(500, description=f"Server error: {str(e)}")
 
