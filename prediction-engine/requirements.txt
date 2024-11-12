@@ -4,3 +4,8 @@ grpcio==1.66.2
 grpcio-tools==1.66.2
 protobuf==5.28.2
 pymongo==4.10.1
+google-cloud-storage==2.18.2
+numpy==1.21.5
+scikit-learn==1.0.2
+joblib
+pandas

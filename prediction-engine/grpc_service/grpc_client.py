@@ -25,6 +25,13 @@ def get_prediction(url):
         response = MessageToDict(
             stub.MakePrediction(features_pb2.PredictionRequest(url=url))
         )
+        # Handle when MessageToDict can't process false
+        if "predictedLabel" not in response:
+            response["predictedLabel"] = False
+        if "accuracy" not in response:
+            response["accuracy"] = 0
+        if "pValueAccuracy" not in response:
+            response["pValueAccuracy"] = 0
         return response
     except grpc.RpcError as e:
         logger.error(f"gRPC error: {e}")
