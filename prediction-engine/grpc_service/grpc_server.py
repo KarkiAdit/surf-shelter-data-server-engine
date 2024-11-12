@@ -9,6 +9,7 @@ import logging
 from typing import Optional
 import time
 from concurrent import futures
+from pymongo import MongoClient
 from . import features_pb2
 from . import features_pb2_grpc
 
@@ -18,6 +19,12 @@ logger = logging.getLogger(__name__)
 
 
 class PredictionProcessor(features_pb2_grpc.PredictionEngineServicer):
+
+    def __init__(self):
+        # Configure MongoDB client with the correct database and collection
+        self.__client = MongoClient(os.getenv("MONGODB_CONFIG_STR"))
+        self.__db = self.__client["new_sampled_rows"]
+        self.__collection = self.__db["predicted_urls_info"]
 
     def fetch_feature_values(self, url) -> Optional[dict]:
         """Fetch feature values for a given URL from different API endpoints provided by the Features Processor Engine.
@@ -94,7 +101,20 @@ class PredictionProcessor(features_pb2_grpc.PredictionEngineServicer):
 
     # gRPC endpoint for making the prediction
     def MakePrediction(self, request, context):
-        # Use New Sampled Rows table to check if the url has already been predicted before
+        url = request.url
+        # Check if the url has already been predicted before
+        existing_record = self.__collection.find_one({"url": url})
+        if existing_record:
+            # If found, return the existing prediction
+            prediction = {
+                "predictedLabel": existing_record["predictedLabel"],
+                "accuracy": existing_record["accuracy"],
+                "pValueAccuracy": existing_record["pValueAccuracy"],
+                "loss": existing_record["loss"],
+            }
+            return features_pb2.PredictionResponse(**prediction)
+        
+        # If no existing record, fetch feature values and make a new prediction
         curr_url_row = self.fetch_feature_values(request.url)
         if curr_url_row:
             logger.info(f"Unusual Extension Info: {curr_url_row}")
