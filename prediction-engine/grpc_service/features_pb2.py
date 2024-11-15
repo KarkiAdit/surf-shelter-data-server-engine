@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x66\x65\x61tures.proto\" \n\x11PredictionRequest\x12\x0b\n\x03url\x18\x01 \x01(\t\"d\n\x12PredictionResponse\x12\x16\n\x0epredictedLabel\x18\x01 \x01(\x08\x12\x10\n\x08\x61\x63\x63uracy\x18\x02 \x01(\x02\x12\x16\n\x0epValueAccuracy\x18\x03 \x01(\x02\x12\x0c\n\x04loss\x18\x04 \x01(\x02\x32O\n\x10PredictionEngine\x12;\n\x0eMakePrediction\x12\x12.PredictionRequest\x1a\x13.PredictionResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x66\x65\x61tures.proto\" \n\x11PredictionRequest\x12\x0b\n\x03url\x18\x01 \x01(\t\"/\n\x0eResponseStatus\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x0f\n\x07message\x18\x02 \x01(\t\"\xd4\x01\n\x08\x46\x65\x61tures\x12\x12\n\nurl_length\x18\x01 \x01(\x02\x12\x1a\n\x12tld_analysis_score\x18\x02 \x01(\x02\x12\x19\n\x11ip_analysis_score\x18\x03 \x01(\x02\x12!\n\x19sub_domain_analysis_score\x18\x04 \x01(\x02\x12\x16\n\x0elevenshtein_dx\x18\x05 \x01(\x02\x12\x14\n\x0ctime_to_live\x18\x06 \x01(\x02\x12\x12\n\ndomain_age\x18\x07 \x01(\x02\x12\x18\n\x10reputation_score\x18\x08 \x01(\x02\"X\n\nPrediction\x12\x17\n\x0fpredicted_label\x18\x01 \x01(\x08\x12\x10\n\x08\x61\x63\x63uracy\x18\x02 \x01(\x02\x12\x11\n\tprecision\x18\x03 \x01(\x02\x12\x0c\n\x04loss\x18\x04 \x01(\x02\"Q\n\x11PredictionDetails\x12\x1b\n\x08\x66\x65\x61tures\x18\x01 \x01(\x0b\x32\t.Features\x12\x1f\n\nprediction\x18\x02 \x01(\x0b\x32\x0b.Prediction\"\x81\x01\n\x12PredictionResponse\x12\x1f\n\x06status\x18\x01 \x01(\x0b\x32\x0f.ResponseStatus\x12\x33\n\x12prediction_details\x18\x02 \x01(\x0b\x32\x12.PredictionDetailsH\x00\x88\x01\x01\x42\x15\n\x13_prediction_details2O\n\x10PredictionEngine\x12;\n\x0eMakePrediction\x12\x12.PredictionRequest\x1a\x13.PredictionResponse\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,8 +33,16 @@ if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_PREDICTIONREQUEST']._serialized_start=18
   _globals['_PREDICTIONREQUEST']._serialized_end=50
-  _globals['_PREDICTIONRESPONSE']._serialized_start=52
-  _globals['_PREDICTIONRESPONSE']._serialized_end=152
-  _globals['_PREDICTIONENGINE']._serialized_start=154
-  _globals['_PREDICTIONENGINE']._serialized_end=233
+  _globals['_RESPONSESTATUS']._serialized_start=52
+  _globals['_RESPONSESTATUS']._serialized_end=99
+  _globals['_FEATURES']._serialized_start=102
+  _globals['_FEATURES']._serialized_end=314
+  _globals['_PREDICTION']._serialized_start=316
+  _globals['_PREDICTION']._serialized_end=404
+  _globals['_PREDICTIONDETAILS']._serialized_start=406
+  _globals['_PREDICTIONDETAILS']._serialized_end=487
+  _globals['_PREDICTIONRESPONSE']._serialized_start=490
+  _globals['_PREDICTIONRESPONSE']._serialized_end=619
+  _globals['_PREDICTIONENGINE']._serialized_start=621
+  _globals['_PREDICTIONENGINE']._serialized_end=700
 # @@protoc_insertion_point(module_scope)

@@ -8,9 +8,35 @@ message PredictionRequest {
     string url = 1;
 }
 
-message PredictionResponse {
-    bool predictedLabel = 1;
+message ResponseStatus {
+    int32 code = 1;
+    string message = 2;
+}
+
+message Features {
+    float url_length = 1;
+    float tld_analysis_score = 2;
+    float ip_analysis_score = 3;
+    float sub_domain_analysis_score = 4;
+    float levenshtein_dx = 5;
+    float time_to_live = 6;
+    float domain_age = 7;
+    float reputation_score = 8;        
+}
+
+message Prediction {
+    bool predicted_label = 1;
     float accuracy = 2;
-    float pValueAccuracy = 3;
+    float precision = 3;
     float loss = 4;
+}
+
+message PredictionDetails {
+    Features features = 1;
+    Prediction prediction = 2;
+}
+
+message PredictionResponse {
+    ResponseStatus status = 1;
+    optional PredictionDetails prediction_details = 2;
 }
