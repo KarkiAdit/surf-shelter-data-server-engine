@@ -5,10 +5,6 @@ RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     && rm -rf /var/lib/apt/lists/*
-# Install the specific version of protoc (28.2)
-RUN wget https://github.com/protocolbuffers/protobuf/releases/download/v28.2/protoc-28.2-linux-x86_64.zip -O protoc.zip \
-    && unzip protoc.zip -d /usr/local \
-    && rm protoc.zip
 # Add /usr/local/bin to the PATH for protoc
 ENV PATH="$PATH:/usr/local/bin"
 COPY requirements.txt .
