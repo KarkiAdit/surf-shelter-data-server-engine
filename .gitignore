@@ -8,3 +8,9 @@ env/
 # Environment variables and credentials
 *.env
 credentials.json
+
+# Remove tracking unnecessary files
+# macOS-specific files
+*.DS_Store
+.AppleDouble
+.LSOverride

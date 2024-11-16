@@ -26,6 +26,13 @@ def get_prediction(url):
                 raw_response,
                 preserving_proto_field_name=True      # Use the proto field names as they are
             )
+            # Handle missing "predicted_label" in prediction
+            prediction_details = response.get("prediction_details", {})
+            prediction = prediction_details.get("prediction", {})
+            if "predicted_label" not in prediction:
+                prediction["predicted_label"] = False
+                prediction_details["prediction"] = prediction  # Update prediction
+                response["prediction_details"] = prediction_details  # Ensure the updated details are saved
             return response
     except grpc.RpcError as e:
         logger.error(f"gRPC error: {e}")
