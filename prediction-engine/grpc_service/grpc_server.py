@@ -26,7 +26,7 @@ class PredictionProcessor(features_pb2_grpc.PredictionEngineServicer):
         # Configure MongoDB client with the correct database and collection
         self.__client = MongoClient(os.getenv("MONGODB_CONFIG_STR"))
         self.__db = self.__client["new_sampled_rows"]
-        self.__collection = self.__db["predicted_urls_info"]
+        self.__collection = self.__db["predicted_urls_records"]
         # Load the recent GCS model
         self.__load_model_from_gcs("surf-shelter-model-v0", "models/svm_model_v0.pkl")
         # Set common info for Feature Processor requests
@@ -127,14 +127,21 @@ class PredictionProcessor(features_pb2_grpc.PredictionEngineServicer):
         existing_record = self.__collection.find_one({"url": self.__url})
         if existing_record:
             # If found, return the existing prediction
-            prediction = {
-                "predictedLabel": existing_record["predictedLabel"],
-                "accuracy": existing_record["accuracy"],
-                "pValueAccuracy": existing_record["pValueAccuracy"],
-                "loss": existing_record["loss"],
-            }
-            return features_pb2.PredictionResponse(**prediction)
-        
+            response = features_pb2.PredictionResponse(
+                status=features_pb2.ResponseStatus(
+                    code=200,
+                    message="Prediction found in existing records"
+                ),
+                prediction_details=features_pb2.PredictionDetails(
+                    features=features_pb2.Features(
+                        **existing_record['prediction_details']['features']
+                    ),
+                    prediction=features_pb2.Prediction(
+                        **existing_record['prediction_details']['prediction']
+                    )
+                )
+            )
+            return response
         # If no existing record, fetch feature values, make a new prediction, and update the New Rows Database
         self.__input_data = {
             'url_length': 0.0,
@@ -146,6 +153,7 @@ class PredictionProcessor(features_pb2_grpc.PredictionEngineServicer):
             'domain_age': 0.0,
             'reputation_score': 0.0
         }
+        # Fetch feature values
         self.__fetch_feature_values()
         if self.__input_data:
             logger.info(f"Features info: {self.__input_data}")
@@ -161,38 +169,42 @@ class PredictionProcessor(features_pb2_grpc.PredictionEngineServicer):
             TP = int(self.__y_true == 1 and predicted_label == 1)
             FP = int(self.__y_true == 0 and predicted_label == 1)
             # Calculate precision for the model
-            if TP + FP == 0:
-                precision = 1
-            else:
-                precision = TP / (TP + FP)
+            precision = 1.0 if TP + FP == 0 else TP / (TP + FP)
+            # Create prediction details
             prediction = {
-                "predictedLabel": bool(predicted_label),
-                "accuracy": accuracy,
-                "pValueAccuracy": precision,
-                "loss": -1,
+                "predicted_label": bool(predicted_label),
+                "accuracy": float(accuracy),
+                "precision": float(precision),
+                "loss": -1.0  # Default value for loss
+            }
+            prediction_details = {
+                "features": self.__input_data,
+                "prediction": prediction
             }
             # Update New Sampled Rows table
-            new_sampled_row = {
+            db_entry = {
                 "url": self.__url,
-                "predictedLabel": prediction["predictedLabel"],
-                "accuracy": prediction["accuracy"],
-                "pValueAccuracy": prediction["pValueAccuracy"],
-                "loss": prediction["loss"],
-                "features": self.__input_data,  # Store features used in prediction
+                "prediction_details": prediction_details
             }
-            self.__collection.insert_one(new_sampled_row)
+            self.__collection.insert_one(db_entry)
             # Return the new prediction
-            return features_pb2.PredictionResponse(**prediction)
-        
-        # For now, return a default value in case of errors
-        prediction = {
-            "predictedLabel": False,
-            "accuracy": 0.95,
-            "pValueAccuracy": 0.05,
-            "loss": 0.15,
-        }
-        return features_pb2.PredictionResponse(**prediction)
-
+            return features_pb2.PredictionResponse(
+                status=features_pb2.ResponseStatus(
+                    code=200,
+                    message="Prediction made using ML trained model on the GCS."
+                ),
+                prediction_details=features_pb2.PredictionDetails(
+                    features=features_pb2.Features(**self.__input_data),
+                    prediction=features_pb2.Prediction(**prediction)
+                )
+            )
+        # Return a response indicating a server-side error
+        return features_pb2.PredictionResponse(
+            status=features_pb2.ResponseStatus(
+                code=500,
+                message="Prediction failed due to a server-side error. A feature could not be processed."
+            )
+        )
 
 def serve():
     # Create a gRPC server
@@ -200,7 +212,7 @@ def serve():
     features_pb2_grpc.add_PredictionEngineServicer_to_server(
         PredictionProcessor(), server
     )
-    server.add_insecure_port("[::]:50051")
+    server.add_insecure_port("0.0.0.0:50051")
     # Start the server
     server.start()
     print("gRPC server is running on port 50051...")

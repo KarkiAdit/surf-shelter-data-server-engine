@@ -15,24 +15,18 @@ logger = logging.getLogger(__name__)
 
 # Function to create the gRPC stub
 def get_grpc_stub():
-    channel = grpc.insecure_channel("localhost:50051")
-    return features_pb2_grpc.PredictionEngineStub(channel)
-
+    return grpc.insecure_channel("localhost:50051")
 
 def get_prediction(url):
     try:
-        stub = get_grpc_stub()
-        response = MessageToDict(
-            stub.MakePrediction(features_pb2.PredictionRequest(url=url))
-        )
-        # Handle when MessageToDict can't process false
-        if "predictedLabel" not in response:
-            response["predictedLabel"] = False
-        if "accuracy" not in response:
-            response["accuracy"] = 0
-        if "pValueAccuracy" not in response:
-            response["pValueAccuracy"] = 0
-        return response
+        with get_grpc_stub() as channel:
+            stub = features_pb2_grpc.PredictionEngineStub(channel)
+            raw_response = stub.MakePrediction(features_pb2.PredictionRequest(url=url))
+            response = MessageToDict(
+                raw_response,
+                preserving_proto_field_name=True      # Use the proto field names as they are
+            )
+            return response
     except grpc.RpcError as e:
         logger.error(f"gRPC error: {e}")
         return {"error": "Failed to get prediction from gRPC server"}
