@@ -36,4 +36,10 @@ def get_prediction(url):
             return response
     except grpc.RpcError as e:
         logger.error(f"gRPC error: {e}")
-        return {"error": "Failed to get prediction from gRPC server"}
+        return {
+            "status": {
+                "code": 500,
+                "message": "gRPC server is loading. Please try again in a few moments..."
+
+            }
+        }             
