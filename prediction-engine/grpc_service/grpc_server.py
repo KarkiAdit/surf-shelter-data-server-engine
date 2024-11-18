@@ -97,7 +97,9 @@ class PredictionProcessor(features_pb2_grpc.PredictionEngineServicer):
         # Fetch and update feature values for each phishing attribute
         if not fetch_and_update(
             "phishing", 
-            {'time_to_live', 'domain_age', 'reputation_score'}
+            {'time_to_live', 'domain_age', 
+            #  'reputation_score' Avoid reputation score for testing purposes
+             }
         ): 
             self.__input_data = None
             return
